@@ -1,0 +1,128 @@
+---
+title: "TP1_GIT"
+author: "Yanina Zambiazzo"
+date: "22/9/2021"
+output: html_document
+---
+
+**TP1**
+*Alumna: Yanina Zambiazzo*
+
+Elegir alguna fuente de datos, importarla en un proyecto de R, limpiarlos, transformalos, describirlos.
+
+
+Trabajaré sobre la base de datos de *venta de departamentos en CABA*.
+#Fuente: Buenos Aires Data
+
+
+**1- Comenzare cargando las librerías**
+
+```{r}
+library(tidyverse)
+library(sf)
+library(dplyr)
+library(readr)
+```
+
+**2-Ahora conozcamos el dataset:**
+
+
+*Para esto, empezaré por los nombres*
+
+```{r}
+departamentos_en_venta <- read.csv("departamentos-en-venta-2001.csv", stringsAsFactors = TRUE, encoding = "latin1", header = TRUE, sep = ";")
+```
+
+
+
+```{r}
+names(departamentos_en_venta)
+```
+
+```{r}
+dim(departamentos_en_venta)
+```
+
+```{r}
+ncol(departamentos_en_venta)
+```
+
+```{r}
+nrow(departamentos_en_venta)
+```
+
+```{r}
+head(departamentos_en_venta)
+```
+
+
+Realizaré un resumen estadístico de los datos:
+
+```{r}
+summary(departamentos_en_venta)
+```
+
+En este resumen podemos comprender varios aspectos de la información:
+
+Hay registros de avisos publicados para la venta de departamentos ubicados en la Ciudad de Buenos Aires desde el año 2001 hasta el 2019.
+
+La media de la superficie de los departamentos es de 72m2 con un mínimo de 20m2 y un máximo de 700m2. Al mismo tiempo, el valor promedio de precio en dólares es de 60000.
+
+La mayor cantidad de departamentos publicados fueron a estrenar, con balcón y ubicación al frente. Por otro lado, el barrio con mayor cantidad de publicaciones es el barrio de Caballito, en la Comuna 6.Por otro lado, la calle con mayor cantidad de publicaciones fue la calle Rivadavia.
+
+A su vez; investigare como es la estructura del dataset:
+
+
+```{r}
+str(departamentos_en_venta)
+```
+
+**3- Ahora estudiaré los datos aplicando distintas funciones, con el fin de ir transformando el mismo para trabajar con los datos que sean significativos por Comunas.**
+
+
+*A continuación ordenaré el Daset en orden ascendente por Comuna*
+
+
+```{r}
+ordenar <- arrange(departamentos_en_venta, COMUNA)
+head(ordenar)
+```
+
+
+*A continuación, voy a renombrar la columna U_S_M2 por “VALORXM2”:*
+
+
+```{r}
+renombrar <- rename(departamentos_en_venta, VALORXM2=U_S_M2 )
+head(renombrar)
+```
+
+```{r}
+mean(departamentos_en_venta$U_S_M2) 
+```
+*El promedio de valor M2 de la ciudad es de 890.9361.*
+
+
+```{r}
+concatenar <-departamentos_en_venta %>%
+  filter(TERRAZA=="BALCON")%>%
+  select(U_S_M2, CALLE, COMUNA)%>%
+  group_by(COMUNA)%>%
+  summarise(Max_COMUNA=max(U_S_M2),Min_COMUNA=min(U_S_M2))
+head(concatenar)
+```
+
+*Se puede observar que los Maximos Valores se encuentran en la Comuna 1, seguido por la Comuna 2*
+
+
+
+**4- Por último, quiero ver un resumen estadístico de las Comunas del dataset:**
+
+
+```{r}
+summary(departamentos_en_venta$COMUNA)
+```
+
+```{r}
+str(departamentos_en_venta$COMUNA)
+```
